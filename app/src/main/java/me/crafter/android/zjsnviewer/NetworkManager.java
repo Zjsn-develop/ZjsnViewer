@@ -112,7 +112,7 @@ public class NetworkManager {
         String market = "&market=2&channel=0&version=2.4.0";
         //返回的是一个16位散列，暂时猜测是md5
         String FinalMd5 = md5(FinalUrl);
-        FinalUrl += "&c=" + FinalMd5 + market;
+        FinalUrl += "&e=" + FinalMd5 + market;
         return FinalUrl;
     }
 
