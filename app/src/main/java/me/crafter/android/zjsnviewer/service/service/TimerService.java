@@ -89,9 +89,10 @@ public class TimerService extends Service {
                 .setContentTitle(title)
                 .setContentText(text)
                 .setStyle(style)
+                .setPriority(NotificationCompat.PRIORITY_MIN)
                 .setGroup(Storage.NOTIFICATION_GROUP_KEY)
                 .setGroupSummary(true)
-                .setContentIntent(Storage.getInfoIntent(context));
+                .setContentIntent(Storage.getInfoIntent());
 
         return builder.build();
     }
@@ -167,10 +168,10 @@ public class TimerService extends Service {
 
             Storage.language = Integer.parseInt(prefs.getString("language", "0"));
             if (prefs.getBoolean("auto_run", true)) {
-                DockInfo.requestUpdate(context);
+                DockInfo.requestUpdate();
             }
             //notification checker
-            if (DockInfo.shouldNotify(context)){
+            if (DockInfo.shouldNotify()){
 
                 String msj_name = prefs.getString("notification_msj_name","");
                 if (msj_name.isEmpty()){
@@ -184,7 +185,7 @@ public class TimerService extends Service {
             //check if screen is on
             //if screen not on, widget should not update
             PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-            boolean screenon = true;
+            boolean screenon;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH){
                 screenon = pm.isInteractive();
             } else {

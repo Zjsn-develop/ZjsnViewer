@@ -37,7 +37,7 @@ public class NotificationSender {
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setDefaults(NotificationCompat.DEFAULT_LIGHTS|NotificationCompat.DEFAULT_SOUND)
 //                .setGroup(Storage.NOTIFICATION_GROUP_KEY)
-                .setContentIntent(Storage.getStartPendingIntent(context))
+                .setContentIntent(Storage.getStartPendingIntent())
                 .setAutoCancel(true);
 
         if (if_send_vibration) {

@@ -28,7 +28,7 @@ public class UpdateTask extends AsyncTask<Void,Void,Void> {
 
     @Override
     protected Void doInBackground(Void... params) {
-        DockInfo.requestUpdate(context);
+        DockInfo.requestUpdate();
         Widget_Main.updateWidget(context);
         Widget_Travel.updateWidget(context);
         Widget_Repair.updateWidget(context);

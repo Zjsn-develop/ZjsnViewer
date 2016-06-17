@@ -13,9 +13,9 @@ import me.crafter.android.zjsnviewer.service.service.TimerService;
  * @desc
  */
 
-public class ZjsApplication extends Application{
+public class ZjsnApplication extends Application{
 
-    private static ZjsApplication instance;
+    private static ZjsnApplication instance;
     private static Context context;
 
     @Override
@@ -26,11 +26,10 @@ public class ZjsApplication extends Application{
         startService(new Intent(this, TimerService.class));
     }
 
-    public static ZjsApplication getInstance() {
+    public static ZjsnApplication getInstance() {
         return instance;
     }
-
     public static Context getAppContext() {
-        return context;
+        return ZjsnApplication.context;
     }
 }

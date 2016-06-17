@@ -5,6 +5,11 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import me.crafter.android.zjsnviewer.ZjsnApplication;
 import me.crafter.android.zjsnviewer.config.Storage;
 
 public class DockInfo {
@@ -14,6 +19,7 @@ public class DockInfo {
     public static int lastUpdate = -1;
 
     public static int[] dockTravelTime = {0, 0, 0, 0};
+    public static int[] exploreID = {0, 0, 0, 0};
     public static int[] dockRepairTime = {0, 0, 0, 0};
     public static int[] dockBuildTime = {0, 0, 0, 0};
     public static int[] dockMakeTime = {0, 0, 0, 0};
@@ -130,12 +136,12 @@ public class DockInfo {
         return ret;
     }
 
-    public static boolean shouldNotify(Context context){
+    public static boolean shouldNotify(){
         // First check no disturb
         Log.d("DockInfo", "check notify");
-        if (Storage.isNoDisturbNow(context)) return false;
+        if (Storage.isNoDisturbNow()) return false;
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ZjsnApplication.getAppContext());
 
         if (!prefs.getBoolean("notification_general", true)) return false;
         boolean[] shouldMap = {prefs.getBoolean("notification_travel", true), prefs.getBoolean("notification_repair", true), prefs.getBoolean("notification_build", true), prefs.getBoolean("notification_make", true)};
@@ -263,9 +269,70 @@ public class DockInfo {
         return ret;
     }
 
-
+    public static boolean parseDockInfo(String response){
+        JSONObject data;
+        String error;
+        try {
+            data = new JSONObject(response);
+            
+    
+            if (!data.has("userVo")){
+                error = Storage.str_noUserData[Storage.language];
+                Storage.str_tiduName = error;
+                return false;
+            }
+    
+            Storage.str_tiduName = data.getJSONObject("userVo").getString("username");
+            exp = data.getJSONObject("userVo").getString("exp");
+            nextExp = data.getJSONObject("userVo").getString("nextExp");
+            level = data.getJSONObject("userVo").getString("level");
+    
+            JSONObject pveExploreVo = data.getJSONObject("pveExploreVo");
+            JSONArray levels = pveExploreVo.getJSONArray("levels");
+//            boolean shouldExplore = false;
+            for (int i = 0; i < levels.length(); i++){
+                JSONObject level = levels.getJSONObject(i);
+                int endTime = level.getInt("endTime");
+                dockTravelTime[level.getInt("fleetId")-1] = endTime;
+                exploreID[level.getInt("fleetId")-1] = level.getInt("exploreId");
+            }
+            JSONArray dockVo = data.getJSONArray("dockVo");
+            JSONArray repairDockVo = data.getJSONArray("repairDockVo");
+            JSONArray equipmentDockVo = data.getJSONArray("equipmentDockVo");
+            for (int i = 0; i < 4; i++){
+                JSONObject o = dockVo.getJSONObject(i);
+                if (o.getInt("locked") == 1){
+                    dockBuildTime[i] = -1;
+                } else if (o.has("endTime")){
+                    dockBuildTime[i] = o.getInt("endTime");
+                } else {
+                    dockBuildTime[i] = 0;
+                }
+                o = repairDockVo.getJSONObject(i);
+                if (o.getInt("locked") == 1){
+                    dockRepairTime[i] = -1;
+                } else if (o.has("endTime")){
+                    dockRepairTime[i] = o.getInt("endTime");
+                } else {
+                    dockRepairTime[i] = 0;
+                }
+                o = equipmentDockVo.getJSONObject(i);
+                if (o.getInt("locked") == 1){
+                    dockMakeTime[i] = -1;
+                } else if (o.has("endTime")){
+                    dockMakeTime[i] = o.getInt("endTime");
+                } else {
+                    dockMakeTime[i] = 0;
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
     //request an update, with a interval of 15 seconds checked
-    public static boolean requestUpdate(Context context){
+    public static boolean requestUpdate(){
         boolean ret = true;
         Log.i("DockInfo", "Current Interval is " + updateInterval + " (" + (currentUnix() - lastUpdate) + ")");
         zjsn_formal_state = zjsn_running_state;
@@ -279,7 +346,7 @@ public class DockInfo {
                 //Zjsn in not running
                 break;
         }
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ZjsnApplication.getAppContext());
 //        如果战舰少女没有运行或者自动运行被关闭则允许更新
         if(!zjsn_running_state||!prefs.getBoolean("auto_run", true)) {
             if (currentUnix() - lastUpdate > updateInterval || zjsn_formal_state != zjsn_running_state||!prefs.getBoolean("auto_run", true)) {
@@ -287,7 +354,7 @@ public class DockInfo {
                 //to prevent multi request caused by delay
                 if (updateInterval == 0) updateInterval =15;
                 lastUpdate = currentUnix();
-                NetworkManager.updateDockInfo(context);
+                NetworkManager.updateDockInfo();
             } else {
                 ret = false;
             }
