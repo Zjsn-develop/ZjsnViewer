@@ -181,123 +181,6 @@ public class NetworkManager {
         }
     }
 
-    //// TODO: 6/8/2016    This should be out of NetworkManager, be apart. New Class Needed.
-    public static boolean autoExplore() {
-        Log.d("NetworkManager", "autoExplore");
-        Log.d("NetworkManager", "check time");
-        boolean explored = false;
-        for (int i = 0; i < DockInfo.dockTravelTime.length; i++){
-            int endTime = DockInfo.dockTravelTime[i];
-            if(endTime < currentUnix()) {
-                explored = explored|NetworkManager.explore(DockInfo.exploreID[i], i+5);
-            }
-        }
-        return explored;
-    }
-
-    /**
-     * @param exploreId 远征区域ID
-     * @param fleetId 舰队编号
-     * @return true or false
-     */
-    public static boolean explore(int exploreId, int fleetId){
-        //// TODO: 6/12/2016  Use isNoAutoExploreNow instead  isNoDisturbNow.
-        if (Storage.isNoDisturbNow()) return false;
-
-//        get explore result
-        String urString = url_server + api_getExploreResult + exploreId;
-        OperateSession exploreSession = new OperateSession(urString);
-        String response;
-        response = exploreSession.open();
-
-        if (response.contains("\"eid\"")){
-            Log.i("autoExplore()", "get eid when get reward.");
-            return false;
-        }
-        // Auto Explore
-        urString = url_server + api_Explore + fleetId + "/" + exploreId;
-        exploreSession.urlString = urString;
-
-        response = exploreSession.open();
-        if (response.contains("\"eid\"")){
-            Log.i("autoExplore()", "get eid when auto explore.");
-            return false;
-        } else {
-            DockInfo.parseExplore(response);
-            return true;
-        }
-    }
-
-    public static boolean autoRepair(){
-        Log.d("NetworkManager", "autoRepair");
-        boolean repaired = false;
-//        get broken ship list
-        List<Integer> broken_ships_id = new ArrayList<>();
-        try {
-            JSONArray ships = DockInfo.Dock.getJSONArray("userShipVO");
-            for (int i = 0; i < ships.length(); i++) {
-                int hp = ships.getJSONObject(i).getJSONObject("battleProps").getInt("hp");
-                int max_hp = ships.getJSONObject(i).getJSONObject("battlePropsMax").getInt("hp");
-                if (hp != max_hp) {
-                    int ship_id = ships.getJSONObject(i).getInt("id");
-                    broken_ships_id.add(ship_id);
-                }
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        if (broken_ships_id.size() == 0) return true;
-
-        for (int i = 0; i < DockInfo.dockRepairTime.length; i++){
-            int endTime = DockInfo.dockRepairTime[i];
-            if (endTime < 1) continue;
-
-            if(endTime < currentUnix()) {
-                NetworkManager.repairComplete(i+1,DockInfo.dockRepairShip[i]);
-            }
-            broken_ships_id.remove(Integer.valueOf(DockInfo.dockRepairShip[i]));
-        }
-
-        for (int i = 0; i < DockInfo.dockRepairTime.length; i++){
-            int endTime = DockInfo.dockRepairTime[i];
-            if(endTime == 0 && broken_ships_id.size() > 0) {
-                NetworkManager.repair(i+1, broken_ships_id.remove(0));
-            }
-        }
-        return true;
-    }
-
-    public static boolean repair(int dockId, int shipId){
-//        get repair result
-
-        String urString = url_server + api_repair + shipId + "/" + dockId;
-        OperateSession exploreSession = new OperateSession(urString);
-        exploreSession.urlString = urString;
-        String response;
-
-        response = exploreSession.open();
-        if (response.contains("\"eid\"")){
-            Log.i("autoRepair()", "get eid when auto explore.");
-            return false;
-        } else {
-            DockInfo.parseRepair(response);
-            return true;
-        }
-    }
-    public static boolean repairComplete(int dockId, int shipId){
-        String urString = url_server + api_repairComplete + dockId + "/" + shipId;
-        OperateSession exploreSession = new OperateSession(urString);
-        String response;
-        response = exploreSession.open();
-        if (response.contains("\"eid\"")){
-            Log.i("autoRepair()", "get eid when get reward.");
-            return false;
-        } else {
-            DockInfo.parseRepair(response);
-        }
-        return true;
-    }
     public static void initServer(){
         final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ZjsnApplication.getAppContext());
         String server = prefs.getString("server", "-1");
@@ -354,8 +237,6 @@ public class NetworkManager {
         // STEP 3 GET USER DATA
         success =initGame();
         if (!success) return false;
-//        autoExplore();
-//        autoRepair();
         return true;
     }
     public static boolean getAccountCookie(){
