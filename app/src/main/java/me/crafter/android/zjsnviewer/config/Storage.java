@@ -4,6 +4,8 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.text.format.DateFormat;
@@ -14,7 +16,7 @@ import java.util.Date;
 import me.crafter.android.zjsnviewer.R;
 import me.crafter.android.zjsnviewer.ui.info.infoactivity.InfoActivity;
 import me.crafter.android.zjsnviewer.ui.preference.notification.DoubleTimePreference;
-
+import me.crafter.android.zjsnviewer.ZjsnApplication;
 public class Storage {
 
     public static int language = 0;
@@ -55,35 +57,36 @@ public class Storage {
 
     public static final String NOTIFICATION_GROUP_KEY = "zjsn_group";
 
-    public static String getZjsnPackageName(Context context){
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+    public static String getZjsnPackageName(){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ZjsnApplication.getAppContext());
         int serverId = Integer.parseInt(prefs.getString("server", "-1"));
-        if (serverId == 0){
-            return "com.muka.shipwarzero";
-        } else if (serverId < 100){
-            return "com.muka.shipwar";
-        } else {
+        if (serverId == 0 | serverId == 1){
             return "com.huanmeng.zhanjian2";
+        } else if (serverId == 3){
+            return "com.huanmeng.zhanjian_jp_release";
         }
+        return null;
     }
 
-    public static PendingIntent getStartPendingIntent(Context context){
-        Intent intent = context.getPackageManager().getLaunchIntentForPackage(Storage.getZjsnPackageName(context));
+    public static PendingIntent getStartPendingIntent(){
+        Context context = ZjsnApplication.getAppContext();
+        Intent intent = context.getPackageManager().getLaunchIntentForPackage(Storage.getZjsnPackageName());
         if (intent == null){
             intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.crafter.me/zjsnviewer/"));
         }
         return PendingIntent.getActivity(context, 0, intent, 0);
     }
 
-    public static PendingIntent getInfoIntent(Context context){
+    public static PendingIntent getInfoIntent(){
+        Context context = ZjsnApplication.getAppContext();
         Intent intent = new Intent(context, InfoActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent pendIntent = PendingIntent.getActivity(context, 0, intent, 0);
         return pendIntent;
     }
 
-    public static float getTextSizeMajor(Context context){
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+    public static float getTextSizeMajor(){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ZjsnApplication.getAppContext());
         String size = prefs.getString("textsize_major", "24");
         float ret = 24;
         try {
@@ -93,8 +96,8 @@ public class Storage {
         return ret;
     }
 
-    public static float getTextSizeMinor(Context context){
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+    public static float getTextSizeMinor(){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ZjsnApplication.getAppContext());
         String size = prefs.getString("textsize_minor", "24");
         float ret = 24;
         try {
@@ -104,8 +107,8 @@ public class Storage {
         return ret;
     }
 
-    public static boolean isNoDisturbNow(Context context){
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+    public static boolean isNoDisturbNow(){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ZjsnApplication.getAppContext());
         boolean on = prefs.getBoolean("notification_do_not_disturb_on", false);
         if (on){
             int now = Integer.parseInt(DateFormat.format("HHmm", new Date(System.currentTimeMillis() % 86400000)).toString());
@@ -125,16 +128,27 @@ public class Storage {
         }
     }
 
-    public static int getVersion(Context context){
-        return context.getResources().getInteger(R.integer.version);
+    public static int getVersion(){
+        Context context = ZjsnApplication.getAppContext();
+        int version;
+        PackageManager manager = context.getPackageManager();
+        try {
+            PackageInfo info = manager.getPackageInfo(
+                    context.getPackageName(), 0);
+             version = info.versionCode;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            version = 9999;
+        }
+        return version;
     }
 
-    public static boolean black(Context context){
-        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("black", false);
+    public static boolean black(){
+        return PreferenceManager.getDefaultSharedPreferences(ZjsnApplication.getAppContext()).getBoolean("black", false);
     }
 
-    public static boolean root(Context context){
-        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("root", false);
+    public static boolean root(){
+        return PreferenceManager.getDefaultSharedPreferences(ZjsnApplication.getAppContext()).getBoolean("root", false);
     }
 
 }

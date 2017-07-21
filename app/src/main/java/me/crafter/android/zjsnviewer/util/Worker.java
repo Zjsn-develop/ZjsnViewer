@@ -27,7 +27,7 @@ import me.crafter.android.zjsnviewer.config.Storage;
 public class Worker {
 
     public static void widgetSetTextSize(Context context, RemoteViews views){
-        float textsize = Storage.getTextSizeMinor(context);
+        float textsize = Storage.getTextSizeMinor();
         views.setTextViewTextSize(R.id.textView1, TypedValue.COMPLEX_UNIT_PX, textsize);
         views.setTextViewTextSize(R.id.textView2, TypedValue.COMPLEX_UNIT_PX, textsize);
         views.setTextViewTextSize(R.id.textView3, TypedValue.COMPLEX_UNIT_PX, textsize);
@@ -35,7 +35,7 @@ public class Worker {
     }
 
     public static void mainSetTextSize(Context context, RemoteViews views){
-        float textsize = Storage.getTextSizeMajor(context);
+        float textsize = Storage.getTextSizeMajor();
         views.setTextViewTextSize(R.id.textView2, TypedValue.COMPLEX_UNIT_PX, textsize);
         views.setTextViewTextSize(R.id.textView, TypedValue.COMPLEX_UNIT_PX, textsize);
     }
@@ -50,14 +50,14 @@ public class Worker {
             String downloadLink = "";
             @Override
             protected Void doInBackground( final Void ... params ) {
-                String response = visit("http://zjsn.acg.land/version.json");
+                String response = visit("http://pnhome.azurewebsites.net/version.json");
                 if (response.equals("ERR1")){
                     state = State.CONNECTION_FAIL;
                     return null;
                 }
                 try {
                     JSONObject obj = new JSONObject(response);
-                    int currVersion = Storage.getVersion(context);
+                    int currVersion = Storage.getVersion();
                     int newVersion = obj.getInt("currentVersion");
                     if (newVersion > currVersion){
                         state = State.UPDATE_FOUND;
@@ -112,7 +112,7 @@ public class Worker {
     }
 
     public static String visit(String urls){
-        String ret = "";
+        String ret;
         try {
             URL url = new URL(urls);
             URLConnection connection = url.openConnection();

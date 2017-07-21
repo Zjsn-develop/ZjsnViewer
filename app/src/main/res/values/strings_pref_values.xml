@@ -27,66 +27,14 @@
     </string-array>
 
     <string-array name="pref_choice_server_name">
-        <item>[战舰少女R] 胡德</item>
-        <item>[战舰少女R] 萨拉托加</item>
-        <item>[战舰少女R] 俾斯麦</item>
-        <item>[战舰少女R] 声望</item>
-        <item>[战舰少女R] 纳尔逊</item>
-        <item>[战舰少女R] 空想</item>
-        <item>[战舰少女R] 海伦娜</item>
-        <item>[战舰少女R] 突击者</item>
-        <item>[战舰少女R] 黎赛留</item>
-        <item>[战舰少女R] 贝尔法斯特</item>
-        <item>[战舰少女R] 埃塞克斯</item>
-        <item>[战舰少女R] 列克星敦</item>
-        <item>[战舰少女R] 欧根亲王</item>
-        <item>[战舰少女R] 提尔比茨</item>
-        <item>[战舰少女R] 大青花鱼</item>
-        <item>[战舰少女R] 阿拉斯加</item>
-        <item>[战舰少女R] 皇家方舟</item>
-        <item>[战舰少女] ZERO</item>
-        <item>[战舰少女] 胡德</item>
-        <item>[战舰少女] 萨拉托加</item>
-        <item>[战舰少女] 俾斯麦</item>
-        <item>[战舰少女] 声望</item>
-        <item>[战舰少女] 纳尔逊</item>
-        <item>[战舰少女] 空想</item>
-        <item>[战舰少女] 海伦娜</item>
-        <item>[战舰少女] 突击者</item>
-        <item>[战舰少女] 黎塞留</item>
-        <item>[战舰少女] 贝尔法斯特</item>
-        <item>[战舰少女] 追赶者</item>
+        <item>安卓</item>
+        <item>苹果</item>
+        <item>日服</item>
     </string-array>
     <string-array name="pref_choice_server_values">
-        <item>101</item>
-        <item>102</item>
-        <item>103</item>
-        <item>104</item>
-        <item>105</item>
-        <item>106</item>
-        <item>107</item>
-        <item>108</item>
-        <item>109</item>
-        <item>110</item>
-        <item>111</item>
-        <item>201</item>
-        <item>202</item>
-        <item>203</item>
-        <item>204</item>
-        <item>205</item>
-        <item>206</item>
         <item>0</item>
         <item>1</item>
         <item>2</item>
-        <item>3</item>
-        <item>4</item>
-        <item>5</item>
-        <item>6</item>
-        <item>7</item>
-        <item>8</item>
-        <item>9</item>
-        <item>10</item>
-        <item>11</item>
     </string-array>
 
     <string name="pref_title_refresh">数据刷新时间</string>

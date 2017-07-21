@@ -22,6 +22,7 @@ import android.util.Log;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import me.crafter.android.zjsnviewer.ZjsnApplication;
 import me.crafter.android.zjsnviewer.util.DockInfo;
 import me.crafter.android.zjsnviewer.util.NotificationSender;
 import me.crafter.android.zjsnviewer.R;
@@ -35,12 +36,9 @@ import me.crafter.android.zjsnviewer.ui.widget.Widget_Travel;
 
 public class TimerService extends Service {
     // constant
-    public static long NOTIFY_INTERVAL = 5 * 1000; // 10 seconds
+    public static long NOTIFY_INTERVAL = 30 * 1000; // 10 seconds
     public static TimerService instance;
     public static int NOTIFICATION_ID = 1314;
-
-    public static BroadcastReceiver mReceiver;
-
     public static int lastWidgetUpdate = 0;
 
     // run on another Thread to avoid crash
@@ -89,9 +87,10 @@ public class TimerService extends Service {
                 .setContentTitle(title)
                 .setContentText(text)
                 .setStyle(style)
+                .setPriority(NotificationCompat.PRIORITY_MIN)
                 .setGroup(Storage.NOTIFICATION_GROUP_KEY)
                 .setGroupSummary(true)
-                .setContentIntent(Storage.getInfoIntent(context));
+                .setContentIntent(Storage.getInfoIntent());
 
         return builder.build();
     }
@@ -103,12 +102,10 @@ public class TimerService extends Service {
     @Override
     public void onCreate() {
         Log.i("TimerService", "onCreate()");
-        if (mReceiver == null){
-            IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_ON);
-            filter.addAction(Intent.ACTION_SCREEN_OFF);
-            mReceiver = new ScreenReceiver();
-            registerReceiver(mReceiver, filter);
-        }
+        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+        PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
+                "MyWakelockTag");
+        wakeLock.acquire();
 
         if (mTimer != null) {
             mTimer.cancel();
@@ -119,11 +116,6 @@ public class TimerService extends Service {
         mTimer.scheduleAtFixedRate(new TimeDisplayTimerTask(), 0, NOTIFY_INTERVAL);
 
         setForeGround(this);
-
-        receive = new ForegroundReceive();
-        IntentFilter filter = new IntentFilter();
-        filter.addAction("OnOrOff");
-        registerReceiver(receive, filter);
     }
 
     @Override
@@ -134,6 +126,8 @@ public class TimerService extends Service {
 
     @Override
     public void onTaskRemoved(Intent rootIntent){
+        // 应该是没什么用，现在国产rom杀进程的时候会干掉一切相关的service，application
+        // 这样就算死前发了个alarm，到点了也没有receiver来接收
         // test
         Log.d("TimerService", "onTaskRemoved is called");
         Intent restartServiceIntent = new Intent(getApplicationContext(), this.getClass());
@@ -150,13 +144,23 @@ public class TimerService extends Service {
     class TimeDisplayTimerTask extends TimerTask {
         @Override
         public void run() {
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    new Proceed().execute();
-                }
-            });
+            new Proceed().execute();
+//            startService(new Intent(instance,ProceedService.class));
+            setForeGround(instance);
+            refresh_notify_interval();
         }
+    }
+
+    public void refresh_notify_interval(){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ZjsnApplication.getAppContext());
+        if (NOTIFY_INTERVAL != (Long.valueOf(prefs.getString("refresh", "60"))) * 1000) {
+
+            NOTIFY_INTERVAL = (Long.valueOf(prefs.getString("refresh", "60"))) * 1000;
+            mTimer.cancel();
+            mTimer = new Timer();
+            mTimer.scheduleAtFixedRate(new TimeDisplayTimerTask(), NOTIFY_INTERVAL, NOTIFY_INTERVAL);
+        }
+        Log.i("TimerService", "NOTIFY_INTERVAL:" + NOTIFY_INTERVAL + " refresh:" + prefs.getString("refresh", "60"));
     }
 
     private class Proceed extends AsyncTask {
@@ -167,10 +171,10 @@ public class TimerService extends Service {
 
             Storage.language = Integer.parseInt(prefs.getString("language", "0"));
             if (prefs.getBoolean("auto_run", true)) {
-                DockInfo.requestUpdate(context);
+                DockInfo.requestUpdate();
             }
             //notification checker
-            if (DockInfo.shouldNotify(context)){
+            if (DockInfo.shouldNotify()){
 
                 String msj_name = prefs.getString("notification_msj_name","");
                 if (msj_name.isEmpty()){
@@ -184,7 +188,7 @@ public class TimerService extends Service {
             //check if screen is on
             //if screen not on, widget should not update
             PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-            boolean screenon = true;
+            boolean screenon;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH){
                 screenon = pm.isInteractive();
             } else {

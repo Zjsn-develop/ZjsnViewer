@@ -6,8 +6,12 @@ import org.json.JSONArray;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import me.crafter.android.zjsnviewer.config.Storage;
@@ -98,5 +102,11 @@ public class JsonUtil {
         ret += calendar.get(Calendar.SECOND) + Storage.str_second[Storage.language];
 
         return ret;
+    }
+
+    public static String long2hms_digit(long time){
+        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss",Locale.getDefault());
+        formatter.setTimeZone(TimeZone.getTimeZone("GMT+0"));
+        return formatter.format(new Date(time*1000L));
     }
 }

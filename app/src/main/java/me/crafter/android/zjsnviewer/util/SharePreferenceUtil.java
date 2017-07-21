@@ -6,7 +6,7 @@ import android.preference.PreferenceManager;
 
 import java.util.Set;
 
-import me.crafter.android.zjsnviewer.ZjsApplication;
+import me.crafter.android.zjsnviewer.ZjsnApplication;
 
 /**
  * @author traburiss
@@ -24,7 +24,7 @@ public class SharePreferenceUtil {
 
     private SharePreferenceUtil(){
 
-        Context context = ZjsApplication.getAppContext();
+        Context context = ZjsnApplication.getAppContext();
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         editor = mSharedPreferences.edit();
     }
