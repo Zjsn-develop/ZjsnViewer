@@ -6,6 +6,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -113,7 +114,7 @@ public class NetworkManager {
      */
     public static String getFinalUrl(String urString) {
         String FinalUrl = urString + "/&t=" + getCurrentUnixTime();
-        String market = "&gz=1&market=2&channel=0&version=3.0.1";
+        String market = "&gz=1&market=2&channel=0&version=3.3.0";
         //返回的是一个16位散列，暂时猜测是md5
         String FinalMd5 = md5(FinalUrl);
         FinalUrl += "&e=" + FinalMd5 + market;
@@ -363,6 +364,9 @@ public class NetworkManager {
         String error = "";
         String username = prefs.getString("username", "none");
         String password = prefs.getString("password", "none");
+        username = Base64.encodeToString(username.getBytes(),Base64.NO_WRAP | Base64.URL_SAFE);
+        password = Base64.encodeToString(password.getBytes(),Base64.NO_WRAP | Base64.URL_SAFE);
+
 //        username = "";
         if (username.equals("none")|password.equals("none")) return false;
         String url;
