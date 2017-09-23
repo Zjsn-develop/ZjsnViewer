@@ -39,7 +39,7 @@ public class UnlockActivity extends BaseFragmentActivity{
         ButterKnife.bind(this);
 
         setToolbarTitle(R.string.unlock_title);
-        changeNameAndUrlAndIcon("loading(真的很慢，要等一两分钟)", "", "").subscribe(locked_ships::add);
+        changeNameAndUrlAndIcon("loading", "", "").subscribe(locked_ships::add);
         adapter = new UnlockAdapter(context, locked_ships);
         rv_unlock.setLayoutManager(new LinearLayoutManager(context));
         rv_unlock.setAdapter(adapter);

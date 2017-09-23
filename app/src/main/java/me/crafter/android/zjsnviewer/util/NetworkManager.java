@@ -17,9 +17,11 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -428,8 +430,16 @@ public class NetworkManager {
         return (networkInfo != null && networkInfo.isConnected());
     }
     public  static boolean rename(int ship_id, String ship_name){
-        String url = url_server + api_login + Integer.toString(ship_id) + "/" + ship_name;
+        String url = null;
+        try {
+            url = url_server + api_rename + Integer.toString(ship_id) + "/" + URLEncoder.encode(ship_name, "utf-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         OperateSession workingSession = new OperateSession(url);
+        String response = workingSession.open();
+//          Log.i("NetworkManager", response.toString());
+        if (response.equals("")) return false;
         SystemClock.sleep(3000);
         return true;
     }
