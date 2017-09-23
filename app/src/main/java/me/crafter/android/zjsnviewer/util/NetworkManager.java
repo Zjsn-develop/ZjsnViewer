@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Base64;
@@ -45,6 +46,7 @@ public class NetworkManager {
     public static String api_getExploreResult = "explore/getResult/"; // +exploreID/
     public static String api_repair = "boat/repair/"; // +shipID/DockID/
     public static String api_repairComplete = "boat/repairComplete/"; // +DockID/+shipID/
+    public static String api_rename = "boat/renameShip/"; // +shipID/+newName/
 
     public static String url_login = "";
     public static String url_server = "";
@@ -424,5 +426,11 @@ public class NetworkManager {
                 context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         return (networkInfo != null && networkInfo.isConnected());
+    }
+    public  static boolean rename(int ship_id, String ship_name){
+        String url = url_server + api_login + Integer.toString(ship_id) + "/" + ship_name;
+        OperateSession workingSession = new OperateSession(url);
+        SystemClock.sleep(3000);
+        return true;
     }
 }

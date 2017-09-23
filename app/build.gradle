@@ -9,8 +9,8 @@ android {
         applicationId "me.crafter.android.zjsnviewer"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 34
-        versionName "2.8.5"
+        versionCode 38
+        versionName "2.8.0"
     }
     lintOptions {
         abortOnError false
@@ -35,6 +35,7 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
+    sourceSets { main { assets.srcDirs = ['src/main/assets', 'src/main/assets/'] } }
 }
 
 buildscript {

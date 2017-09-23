@@ -291,6 +291,20 @@
                         style="@style/DrawerLayoutLeftButton"
                         android:text="@string/web_site"/>
 
+                    <TextView
+                        android:id="@+id/tv_rename"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/DrawerLayoutLeftButton"
+                        android:text="@string/rename_title"/>
+
+                    <TextView
+                        android:id="@+id/tv_unlock"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/DrawerLayoutLeftButton"
+                        android:text="@string/unlock_title"/>
+
 
                     <TextView
                         android:id="@+id/tv_equipment"

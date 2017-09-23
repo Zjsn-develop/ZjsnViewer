@@ -60,6 +60,11 @@
     <string name="make_time_info">开发时间</string>
     <string name="equipment">装备(衣服)</string>
 
+    <string name="rename_not_start">"点击右下角开始去除动物园"</string>
+    <string name="rename_title">"去除动物园"</string>
+
+    <string name="unlock_title">"查看未解锁"</string>
+
     <string name="equipment_id">图鉴编号</string>
     <string name="equipment_time">开发时间</string>
     <string name="equipment_threshold">开发阈值</string>

@@ -32,8 +32,10 @@ import me.crafter.android.zjsnviewer.ui.info.infofragment.MakeFragment;
 import me.crafter.android.zjsnviewer.ui.info.infofragment.RepairFragment;
 import me.crafter.android.zjsnviewer.ui.info.infofragment.TravelFragment;
 import me.crafter.android.zjsnviewer.ui.preference.main.ZjsnViewer;
+import me.crafter.android.zjsnviewer.ui.rename.RenameActivity;
 import me.crafter.android.zjsnviewer.ui.time.BuildTimeActivity;
 import me.crafter.android.zjsnviewer.ui.time.MakeTimeActivity;
+import me.crafter.android.zjsnviewer.ui.unlock.UnlockActivity;
 import me.crafter.android.zjsnviewer.ui.web.WebActivity;
 import me.crafter.android.zjsnviewer.util.DockInfo;
 import me.crafter.android.zjsnviewer.util.SharePreferenceUtil;
@@ -65,6 +67,8 @@ public class InfoActivity extends BaseFragmentActivity {
     @BindView(R.id.tv_goto_build_time) TextView tv_goto_build_time;
     @BindView(R.id.tv_goto_make_time) TextView tv_goto_make_time;
     @BindView(R.id.tv_web) TextView tv_web;
+    @BindView(R.id.tv_rename) TextView tv_rename;
+    @BindView(R.id.tv_unlock) TextView tv_unlock;
     @BindView(R.id.tv_setting) TextView tv_setting;
 
     private Context context;
@@ -104,12 +108,16 @@ public class InfoActivity extends BaseFragmentActivity {
         super.onPause();
     }
 
-    private void initData(){
+    private boolean initData(){
 
         context = this;
         String username = SharePreferenceUtil.getInstance().getValue("username", "none");
         String password = SharePreferenceUtil.getInstance().getValue("password", "none");
-        if (username.equalsIgnoreCase("none") &&  password.equalsIgnoreCase("none")) Toast.makeText(context, R.string.username_hint, Toast.LENGTH_SHORT).show();
+        if (username.equalsIgnoreCase("none") &&  password.equalsIgnoreCase("none")){
+            Toast.makeText(context, R.string.username_hint, Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        else return true;
     }
 
     private void initView(){
@@ -126,19 +134,27 @@ public class InfoActivity extends BaseFragmentActivity {
         });
 
         srl_refresh.setOnRefreshListener(() -> {
-
-            DockInfo.updateInterval = 0;
-            UpdateTask task = new UpdateTask(context);
-            task.setUpdateTaskStateChange(()-> {
-
-                Toast.makeText(InfoActivity.this,R.string.loading_success, Toast.LENGTH_SHORT).show();
+            if (initData()) {
+                DockInfo.updateInterval = 0;
+                UpdateTask task = new UpdateTask(context);
+                task.setUpdateTaskStateChange(() -> {
+                    if (DockInfo.Dock != null) {
+                        Toast.makeText(InfoActivity.this, R.string.loading_success, Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(InfoActivity.this, R.string.shipowner, Toast.LENGTH_SHORT).show();
+                    }
+                    refreshAllView();
+                    srl_refresh.setRefreshing(false);
+                    handler.removeCallbacks(runnable);
+                    run_time = Long.valueOf(SharePreferenceUtil.getInstance().getValue("refresh", "60")) * 1000;
+                    handler.postDelayed(runnable, run_time);
+                });
+                task.execute();
+            }
+            else {
                 srl_refresh.setRefreshing(false);
-                refreshAllView();
-                handler.removeCallbacks(runnable);
-                run_time = Long.valueOf(SharePreferenceUtil.getInstance().getValue("refresh", "60"))*1000;
-                handler.postDelayed(runnable, run_time);
-            });
-            task.execute();
+            }
+
         });
 
         RxViewPager.pageSelections(vp_page).subscribe(this::setTab);
@@ -188,6 +204,14 @@ public class InfoActivity extends BaseFragmentActivity {
         });
         RxView.clicks(tv_web).subscribe(aVoid -> {
             startActivity(WebActivity.class);
+            dl_drawer.closeDrawers();
+        });
+        RxView.clicks(tv_rename).subscribe(aVoid -> {
+            startActivity(RenameActivity.class);
+            dl_drawer.closeDrawers();
+        });
+        RxView.clicks(tv_unlock).subscribe(aVoid -> {
+            startActivity(UnlockActivity.class);
             dl_drawer.closeDrawers();
         });
         RxView.clicks(tv_setting).subscribe(aVoid -> {

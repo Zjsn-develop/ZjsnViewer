@@ -161,6 +161,10 @@
         </activity>
         <activity android:name=".ui.time.MakeTimeActivity">
         </activity>
+        <activity android:name=".ui.rename.RenameActivity">
+        </activity>
+        <activity android:name=".ui.unlock.UnlockActivity">
+        </activity>
         <activity android:name=".ui.equipment.list.EquipmentListActivity">
         </activity>
         <activity android:name=".ui.equipment.info.EquipmentInfoActivity"
