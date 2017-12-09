@@ -149,6 +149,25 @@ public class Worker {
                 .show();
     }
 
+    // TODO: 12/9/2017 弄个自动更新init文件的功能
+    public static void askUpdateInitfile(final Activity activity, final Context context, String message, final String url){
+        new AlertDialog.Builder(activity)
+                .setTitle(R.string.check_update_title)
+                .setMessage(message)
+                .setPositiveButton(R.string.check_update_yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                        activity.startActivity(intent);
+                    }
+                })
+                .setNegativeButton(R.string.check_update_no, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_info)
+                .show();
+    }
+
     public static boolean testSuperUser(final Context context){
         Process p;
         try {
