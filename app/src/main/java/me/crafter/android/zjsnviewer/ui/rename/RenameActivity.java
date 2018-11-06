@@ -94,12 +94,13 @@ public class RenameActivity extends BaseFragmentActivity {
                     cid = ship.getInt("ship_cid");
                 }else if (ship.has("shipCid")){
                     cid = ship.getInt("shipCid");
+                } else {
+                    continue;
                 }
-                else continue;
 
                 JSONObject card = shipCard.get(cid);
                 if (card == null){
-                    append("can not find ship with cid: " + Integer.toString(ship.getInt("cid")));
+                    append("can not find ship with cid: " + Integer.toString(cid));
                 }else {
                     String nick_name = ship.getString("title");
                     String name = card.getString("title");
@@ -119,7 +120,7 @@ public class RenameActivity extends BaseFragmentActivity {
     }
 
     private void append(String text){
-        Handler handler = RenameActivity.this.updat_handler;
+        Handler handler = updat_handler;
         Message msg = handler.obtainMessage();
         msg.obj = text;
         msg.what = UPDATE_LOG;
